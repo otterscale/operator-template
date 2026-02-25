@@ -5,8 +5,6 @@
 [![codecov](https://codecov.io/gh/otterscale/operator-template/branch/main/graph/badge.svg)](https://codecov.io/gh/otterscale/operator-template)
 [![Go Report Card](https://goreportcard.com/badge/github.com/otterscale/operator-template)](https://goreportcard.com/report/github.com/otterscale/operator-template)
 [![Release](https://img.shields.io/github/v/release/otterscale/operator-template)](https://github.com/otterscale/operator-template/releases/latest)
-[![Go Version](https://img.shields.io/github/go-mod/go-version/otterscale/operator-template)](go.mod)
-[![Kubebuilder](https://img.shields.io/badge/kubebuilder-v4.12.0-blue)](https://book.kubebuilder.io)
 [![License](https://img.shields.io/github/license/otterscale/operator-template)](LICENSE)
 
 A GitHub repository template for building Kubernetes operators that reconcile [OtterScale](https://github.com/otterscale/api) custom resources. Scaffolded with [Kubebuilder](https://book.kubebuilder.io) v4.
