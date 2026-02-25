@@ -38,6 +38,7 @@ import (
 )
 
 var (
+	version  = "devel"
 	scheme   = runtime.NewScheme()
 	setupLog = ctrl.Log.WithName("setup")
 )

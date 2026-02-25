@@ -49,6 +49,18 @@ go mod tidy
 make manifests generate
 ```
 
+## Versioning
+
+The `cmd/main.go` file declares a `version` variable (defaults to `"devel"`). This value is injected at build time via `-ldflags`:
+
+```go
+var version = "devel"
+```
+
+Both the `Makefile` and `Dockerfile` automatically pass `VERSION` (derived from `git describe --tags --always`) through `-ldflags "-X main.version=$(VERSION)"`. If you add version-dependent logic (e.g. logging, health endpoints, or user-agent strings), make sure to reference `version` from `cmd/main.go`.
+
+> **Note:** When customizing the build process or adding a new build target, remember to include `-ldflags "-X main.version=$(VERSION)"` so the binary embeds the correct version.
+
 ## Development
 
 ### Prerequisites
