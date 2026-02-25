@@ -49,6 +49,140 @@ go mod tidy
 make manifests generate
 ```
 
+### Add Aggregate RBAC Roles
+
+Kubebuilder does not scaffold aggregate `ClusterRole` files for custom resources. You need to create them manually so that the default `admin`, `edit`, and `view` ClusterRoles automatically inherit permissions for your resource.
+
+For each Kind (e.g. `Module`), create the following files under `config/rbac/`:
+
+| File                      | Purpose                                               |
+| ------------------------- | ----------------------------------------------------- |
+| `module_admin_role.yaml`  | Full CRUD — aggregated into the `admin` ClusterRole   |
+| `module_editor_role.yaml` | Read + write — aggregated into the `edit` ClusterRole |
+| `module_viewer_role.yaml` | Read-only — aggregated into the `view` ClusterRole    |
+
+Each file is a `ClusterRole` with the appropriate `rbac.authorization.k8s.io/aggregate-to-*` label set to `"true"`. Example for a `Module` resource in the `addons.otterscale.io` API group:
+
+**`config/rbac/module_admin_role.yaml`**
+
+```yaml
+# This rule is not used by the project operator-template itself.
+# It is provided to allow the cluster admin to help manage permissions for users.
+#
+# Grants read-only access to addons.otterscale.io resources.
+# This role is intended for users who need visibility into these resources
+# without permissions to modify them. It is ideal for monitoring purposes and limited-access viewing.
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: operator-template
+    app.kubernetes.io/managed-by: kustomize
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+  name: workspace-admin-role
+rules:
+  - apiGroups:
+      - addons.otterscale.io
+    resources:
+      - modules
+    verbs:
+      - "*"
+  - apiGroups:
+      - addons.otterscale.io
+    resources:
+      - modules/status
+    verbs:
+      - get
+```
+
+**`config/rbac/module_editor_role.yaml`**
+
+```yaml
+# This rule is not used by the project operator-template itself.
+# It is provided to allow the cluster admin to help manage permissions for users.
+#
+# Grants read-only access to addons.otterscale.io resources.
+# This role is intended for users who need visibility into these resources
+# without permissions to modify them. It is ideal for monitoring purposes and limited-access viewing.
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: operator-template
+    app.kubernetes.io/managed-by: kustomize
+    rbac.authorization.k8s.io/aggregate-to-edit: "true"
+  name: workspace-editor-role
+rules:
+  - apiGroups:
+      - addons.otterscale.io
+    resources:
+      - modules
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - addons.otterscale.io
+    resources:
+      - modules/status
+    verbs:
+      - get
+```
+
+**`config/rbac/module_viewer_role.yaml`**
+
+```yaml
+# This rule is not used by the project operator-template itself.
+# It is provided to allow the cluster admin to help manage permissions for users.
+#
+# Grants read-only access to addons.otterscale.io resources.
+# This role is intended for users who need visibility into these resources
+# without permissions to modify them. It is ideal for monitoring purposes and limited-access viewing.
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: operator-template
+    app.kubernetes.io/managed-by: kustomize
+    rbac.authorization.k8s.io/aggregate-to-view: "true"
+  name: workspace-viewer-role
+rules:
+  - apiGroups:
+      - addons.otterscale.io
+    resources:
+      - modules
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - addons.otterscale.io
+    resources:
+      - modules/status
+    verbs:
+      - get
+```
+
+Then register them in `config/rbac/kustomization.yaml`:
+
+```yaml
+resources:
+  # For each CRD, "Admin", "Editor" and "Viewer" roles are scaffolded by
+  # default, aiding admins in cluster management. Those roles are
+  # not used by the operator-template itself. You can comment the following lines
+  # if you do not want those helpers be installed with your Project.
+  - module_admin_role.yaml
+  - module_editor_role.yaml
+  - module_viewer_role.yaml
+```
+
 ## Versioning
 
 The `cmd/main.go` file declares a `version` variable (defaults to `"devel"`). This value is injected at build time via `-ldflags`:
