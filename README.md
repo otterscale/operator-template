@@ -1,121 +1,137 @@
 # operator-template
-// TODO(user): Add simple overview of use/purpose
 
-## Description
-// TODO(user): An in-depth paragraph about your project and overview of use
+[![Tests](https://github.com/otterscale/operator-template/actions/workflows/test.yml/badge.svg)](https://github.com/otterscale/operator-template/actions/workflows/test.yml)
+[![Lint](https://github.com/otterscale/operator-template/actions/workflows/lint.yml/badge.svg)](https://github.com/otterscale/operator-template/actions/workflows/lint.yml)
+[![codecov](https://codecov.io/gh/otterscale/operator-template/branch/main/graph/badge.svg)](https://codecov.io/gh/otterscale/operator-template)
+[![Go Report Card](https://goreportcard.com/badge/github.com/otterscale/operator-template)](https://goreportcard.com/report/github.com/otterscale/operator-template)
+[![Release](https://img.shields.io/github/v/release/otterscale/operator-template)](https://github.com/otterscale/operator-template/releases/latest)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/otterscale/operator-template)](go.mod)
+[![Kubebuilder](https://img.shields.io/badge/kubebuilder-v4.12.0-blue)](https://book.kubebuilder.io)
+[![License](https://img.shields.io/github/license/otterscale/operator-template)](LICENSE)
 
-## Getting Started
+A GitHub repository template for building Kubernetes operators that reconcile [OtterScale](https://github.com/otterscale/api) custom resources. Scaffolded with [Kubebuilder](https://book.kubebuilder.io) v4.
+
+## Quick Start
+
+Click **"Use this template"** on GitHub to create a new repository, then clone it locally.
+
+### Add an API Controller
+
+Use `kubebuilder create api` with the external API flags to scaffold a controller for an OtterScale resource:
+
+```bash
+kubebuilder create api \
+  --group addons --version v1alpha1 --kind Module \
+  --controller=true --resource=false \
+  --external-api-path=github.com/otterscale/api/addons/v1alpha1 \
+  --external-api-domain=otterscale.io \
+  --external-api-module=github.com/otterscale/api
+```
+
+| Flag | Purpose |
+|---|---|
+| `--controller=true` | Generate a controller for reconciliation logic |
+| `--resource=false` | Skip CRD generation (the CRD is defined in the external API) |
+| `--external-api-path` | Go import path of the external API types |
+| `--external-api-domain` | API group domain (produces `addons.otterscale.io`) |
+| `--external-api-module` | Go module that provides the types |
+
+This scaffolds:
+- `internal/controller/module_controller.go` — reconciliation logic
+- `internal/controller/module_controller_test.go` — test skeleton
+- Registration in `cmd/main.go`
+
+Repeat for additional resources by changing `--group`, `--version`, and `--kind`.
+
+### After Scaffolding
+
+```bash
+go mod tidy
+make manifests generate
+```
+
+## Development
 
 ### Prerequisites
-- go version v1.24.6+
-- docker version 17.03+.
-- kubectl version v1.11.3+.
-- Access to a Kubernetes v1.11.3+ cluster.
 
-### To Deploy on the cluster
-**Build and push your image to the location specified by `IMG`:**
+- Go 1.26+
+- Docker 17.03+
+- kubectl v1.11.3+
+- Access to a Kubernetes cluster
 
-```sh
-make docker-build docker-push IMG=<some-registry>/operator-template:tag
+### Run Locally
+
+```bash
+make run
 ```
 
-**NOTE:** This image ought to be published in the personal registry you specified.
-And it is required to have access to pull the image from the working environment.
-Make sure you have the proper permission to the registry if the above commands don’t work.
+### Run Tests
 
-**Install the CRDs into the cluster:**
-
-```sh
-make install
+```bash
+make test
 ```
 
-**Deploy the Manager to the cluster with the image specified by `IMG`:**
+### Lint
 
-```sh
-make deploy IMG=<some-registry>/operator-template:tag
+```bash
+make lint      # check
+make lint-fix  # auto-fix
 ```
 
-> **NOTE**: If you encounter RBAC errors, you may need to grant yourself cluster-admin
-privileges or be logged in as admin.
+## Deployment
 
-**Create instances of your solution**
-You can apply the samples (examples) from the config/sample:
+### Build & Push Image
 
-```sh
-kubectl apply -k config/samples/
+```bash
+export IMG=<registry>/<project>:tag
+make docker-build docker-push IMG=$IMG
 ```
 
->**NOTE**: Ensure that the samples has default values to test it out.
+### Deploy to Cluster
 
-### To Uninstall
-**Delete the instances (CRs) from the cluster:**
-
-```sh
-kubectl delete -k config/samples/
+```bash
+make deploy IMG=$IMG
 ```
 
-**Delete the APIs(CRDs) from the cluster:**
+### Undeploy
 
-```sh
-make uninstall
-```
-
-**UnDeploy the controller from the cluster:**
-
-```sh
+```bash
 make undeploy
 ```
 
-## Project Distribution
+## CI / CD
 
-Following the options to release and provide this solution to the users.
+This template includes GitHub Actions workflows out of the box:
 
-### By providing a bundle with all YAML files
+| Workflow | Trigger | Description |
+|---|---|---|
+| **Lint** | push, PR | Runs `golangci-lint` |
+| **Tests** | push, PR | Runs `make test` (unit tests via envtest) |
+| **E2E Tests** | push, PR | Runs end-to-end tests on a Kind cluster |
+| **Publish** | release published | Builds & pushes image to `ghcr.io`, uploads `install.yaml` |
+| **Auto Update** | weekly (Tue) / manual | Checks for Kubebuilder scaffold updates |
 
-1. Build the installer for the image built and published in the registry:
+## Distribution
 
-```sh
-make build-installer IMG=<some-registry>/operator-template:tag
+### YAML Bundle
+
+```bash
+make build-installer IMG=<registry>/<project>:tag
 ```
 
-**NOTE:** The makefile target mentioned above generates an 'install.yaml'
-file in the dist directory. This file contains all the resources built
-with Kustomize, which are necessary to install this project without its
-dependencies.
+Users install with:
 
-2. Using the installer
-
-Users can just run 'kubectl apply -f <URL for YAML BUNDLE>' to install
-the project, i.e.:
-
-```sh
-kubectl apply -f https://raw.githubusercontent.com/<org>/operator-template/<tag or branch>/dist/install.yaml
+```bash
+kubectl apply -f https://raw.githubusercontent.com/<org>/<repo>/<tag>/dist/install.yaml
 ```
 
-### By providing a Helm Chart
+### Helm Chart
 
-1. Build the chart using the optional helm plugin
-
-```sh
+```bash
 kubebuilder edit --plugins=helm/v2-alpha
 ```
 
-2. See that a chart was generated under 'dist/chart', and users
-can obtain this solution from there.
-
-**NOTE:** If you change the project, you need to update the Helm Chart
-using the same command above to sync the latest changes. Furthermore,
-if you create webhooks, you need to use the above command with
-the '--force' flag and manually ensure that any custom configuration
-previously added to 'dist/chart/values.yaml' or 'dist/chart/manager/manager.yaml'
-is manually re-applied afterwards.
-
-## Contributing
-// TODO(user): Add detailed information on how you would like others to contribute to this project
-
-**NOTE:** Run `make help` for more information on all potential `make` targets
-
-More information can be found via the [Kubebuilder Documentation](https://book.kubebuilder.io/introduction.html)
+A chart will be generated under `dist/chart/`.
 
 ## License
 
@@ -132,4 +148,3 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
