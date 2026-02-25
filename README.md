@@ -1,4 +1,4 @@
-# operator-template
+# OtterScale Operator Template
 
 [![Tests](https://github.com/otterscale/operator-template/actions/workflows/test.yml/badge.svg)](https://github.com/otterscale/operator-template/actions/workflows/test.yml)
 [![Lint](https://github.com/otterscale/operator-template/actions/workflows/lint.yml/badge.svg)](https://github.com/otterscale/operator-template/actions/workflows/lint.yml)
@@ -28,15 +28,16 @@ kubebuilder create api \
   --external-api-module=github.com/otterscale/api
 ```
 
-| Flag | Purpose |
-|---|---|
-| `--controller=true` | Generate a controller for reconciliation logic |
-| `--resource=false` | Skip CRD generation (the CRD is defined in the external API) |
-| `--external-api-path` | Go import path of the external API types |
-| `--external-api-domain` | API group domain (produces `addons.otterscale.io`) |
-| `--external-api-module` | Go module that provides the types |
+| Flag                    | Purpose                                                      |
+| ----------------------- | ------------------------------------------------------------ |
+| `--controller=true`     | Generate a controller for reconciliation logic               |
+| `--resource=false`      | Skip CRD generation (the CRD is defined in the external API) |
+| `--external-api-path`   | Go import path of the external API types                     |
+| `--external-api-domain` | API group domain (produces `addons.otterscale.io`)           |
+| `--external-api-module` | Go module that provides the types                            |
 
 This scaffolds:
+
 - `internal/controller/module_controller.go` — reconciliation logic
 - `internal/controller/module_controller_test.go` — test skeleton
 - Registration in `cmd/main.go`
@@ -103,13 +104,13 @@ make undeploy
 
 This template includes GitHub Actions workflows out of the box:
 
-| Workflow | Trigger | Description |
-|---|---|---|
-| **Lint** | push, PR | Runs `golangci-lint` |
-| **Tests** | push, PR | Runs `make test` (unit tests via envtest) |
-| **E2E Tests** | push, PR | Runs end-to-end tests on a Kind cluster |
-| **Publish** | release published | Builds & pushes image to `ghcr.io`, uploads `install.yaml` |
-| **Auto Update** | weekly (Tue) / manual | Checks for Kubebuilder scaffold updates |
+| Workflow        | Trigger               | Description                                                |
+| --------------- | --------------------- | ---------------------------------------------------------- |
+| **Lint**        | push, PR              | Runs `golangci-lint`                                       |
+| **Tests**       | push, PR              | Runs `make test` (unit tests via envtest)                  |
+| **E2E Tests**   | push, PR              | Runs end-to-end tests on a Kind cluster                    |
+| **Publish**     | release published     | Builds & pushes image to `ghcr.io`, uploads `install.yaml` |
+| **Auto Update** | weekly (Tue) / manual | Checks for Kubebuilder scaffold updates                    |
 
 ## Distribution
 
