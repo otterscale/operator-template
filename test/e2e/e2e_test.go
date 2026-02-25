@@ -34,7 +34,7 @@ import (
 )
 
 // namespace where the project is deployed in
-const namespace = "operator-template-system"
+const namespace = "otterscale-system"
 
 // serviceAccountName created for the project
 const serviceAccountName = "operator-template-controller-manager"
