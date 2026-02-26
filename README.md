@@ -80,7 +80,7 @@ metadata:
     app.kubernetes.io/name: operator-template
     app.kubernetes.io/managed-by: kustomize
     rbac.authorization.k8s.io/aggregate-to-admin: "true"
-  name: workspace-admin-role
+  name: module-admin-role
 rules:
   - apiGroups:
       - addons.otterscale.io
@@ -113,7 +113,7 @@ metadata:
     app.kubernetes.io/name: operator-template
     app.kubernetes.io/managed-by: kustomize
     rbac.authorization.k8s.io/aggregate-to-edit: "true"
-  name: workspace-editor-role
+  name: module-editor-role
 rules:
   - apiGroups:
       - addons.otterscale.io
@@ -152,7 +152,7 @@ metadata:
     app.kubernetes.io/name: operator-template
     app.kubernetes.io/managed-by: kustomize
     rbac.authorization.k8s.io/aggregate-to-view: "true"
-  name: workspace-viewer-role
+  name: module-viewer-role
 rules:
   - apiGroups:
       - addons.otterscale.io
