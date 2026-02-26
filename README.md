@@ -61,7 +61,11 @@ For each Kind (e.g. `Module`), create the following files under `config/rbac/`:
 | `module_editor_role.yaml` | Read + write — aggregated into the `edit` ClusterRole |
 | `module_viewer_role.yaml` | Read-only — aggregated into the `view` ClusterRole    |
 
-Each file is a `ClusterRole` with the appropriate `rbac.authorization.k8s.io/aggregate-to-*` label set to `"true"`. Example for a `Module` resource in the `addons.otterscale.io` API group:
+Each file is a `ClusterRole` with the appropriate `rbac.authorization.k8s.io/aggregate-to-*` label set to `"true"`.
+
+> **Note:** The `aggregate-to-admin`, `aggregate-to-edit`, and `aggregate-to-view` labels only apply to **namespaced** resources, because the built-in `admin` / `edit` / `view` ClusterRoles are designed for namespace-scoped access (bound via `RoleBinding`). If your resource is **cluster-scoped**, these aggregate labels have no effect; use `aggregate-to-cluster-admin` instead, or create dedicated `ClusterRoleBinding`s.
+
+Example for a `Module` resource in the `addons.otterscale.io` API group:
 
 **`config/rbac/module_admin_role.yaml`**
 
