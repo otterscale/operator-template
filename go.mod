@@ -3,7 +3,7 @@ module github.com/otterscale/operator-template
 go 1.26.0
 
 require (
-	github.com/onsi/ginkgo/v2 v2.28.1
+	github.com/onsi/ginkgo/v2 v2.28.2
 	github.com/onsi/gomega v1.39.1
 	k8s.io/apimachinery v0.35.1
 	k8s.io/client-go v0.35.1
