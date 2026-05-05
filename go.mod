@@ -1,5 +1,15 @@
 module github.com/otterscale/operator-template
 
+<<<<<<< HEAD
+go 1.25.7
+
+require (
+	github.com/onsi/ginkgo/v2 v2.27.2
+	github.com/onsi/gomega v1.38.2
+	k8s.io/apimachinery v0.35.0
+	k8s.io/client-go v0.35.0
+	sigs.k8s.io/controller-runtime v0.23.3
+=======
 go 1.26.0
 
 require (
@@ -8,6 +18,7 @@ require (
 	k8s.io/apimachinery v0.35.1
 	k8s.io/client-go v0.35.1
 	sigs.k8s.io/controller-runtime v0.23.1
+>>>>>>> tmp-original-05-05-26-02-06
 )
 
 require (
